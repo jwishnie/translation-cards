@@ -60,12 +60,14 @@ public class TranslationsActivityTest {
     private TranslationsActivity translationsActivity;
     private DbManager dbManagerMock;
     private Dictionary.Translation translation;
+    private boolean NOT_LOCKED;
 
     @Before
     public void setUp() {
         RoboGuice.setUseAnnotationDatabases(false);
         Intent intent = new Intent();
-        Deck deck = new Deck(DEFAULT_DECK_NAME, NO_VALUE, NO_VALUE, DEFAULT_DECK_ID, DEFAULT_LONG, false);
+        NOT_LOCKED = false;
+        Deck deck = new Deck(DEFAULT_DECK_NAME, NO_VALUE, NO_VALUE, DEFAULT_DECK_ID, DEFAULT_LONG, NOT_LOCKED);
         intent.putExtra("Deck", deck);
         initializeMockDbManager();
         RoboGuice.overrideApplicationInjector(RuntimeEnvironment.application,

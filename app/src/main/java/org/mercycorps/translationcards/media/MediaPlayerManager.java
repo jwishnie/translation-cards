@@ -4,6 +4,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,11 +63,11 @@ public class MediaPlayerManager implements Runnable {
         }
     }
 
-    public void play(String filename, ProgressBar progressBar) {
+    public void play(FileDescriptor fileDescriptor, ProgressBar progressBar) {
         resetProgressBar();
         this.progressBar = progressBar;
         try {
-            mediaPlayer.setDataSource(filename);
+            mediaPlayer.setDataSource(fileDescriptor);
             mediaPlayer.prepare();
         } catch (IOException e) {
             Log.d(TAG, "Error getting audio asset: " + e);

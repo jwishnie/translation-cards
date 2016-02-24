@@ -1,12 +1,17 @@
 package org.mercycorps.translationcards.media;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Created by njimenez and pdale on 2/18/16.
  */
 public class CardAudioClickListener implements View.OnClickListener {
+    private static final String TAG = "CardAudioClickListener";
     private String filename;
     private final ProgressBar progressBar;
     private MediaPlayerManager lastMediaPlayerManager;
@@ -21,7 +26,12 @@ public class CardAudioClickListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         stop();
-        lastMediaPlayerManager.play(filename, progressBar);
+        try {
+            lastMediaPlayerManager.play(new FileInputStream(filename).getFD(), progressBar);
+        } catch (IOException e) {
+            Log.d(TAG, "Error preparing audio.");
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public void stop() {

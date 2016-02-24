@@ -8,6 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mercycorps.translationcards.media.MediaPlayerManager;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 
 import static org.mockito.Mockito.mock;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 public class MediaPlayerManagerTest {
 
     public static final int SOME_DURATION = 5;
-    public static final String ANY_FILENAME = "";
+    public static final FileDescriptor ANY_FILE = new FileDescriptor();
     private MediaPlayer mediaPlayer;
     private MediaPlayerManager mediaPlayerManager;
 
@@ -31,14 +32,16 @@ public class MediaPlayerManagerTest {
 
     @Test
     public void play_shouldSetMediaPlayerDataSourceToSomeFilename() throws IOException {
-        mediaPlayerManager.play("SomeFilename", mock(ProgressBar.class));
+        FileDescriptor fileDescriptor = new FileDescriptor();
 
-        verify(mediaPlayer).setDataSource("SomeFilename");
+        mediaPlayerManager.play(fileDescriptor, mock(ProgressBar.class));
+
+        verify(mediaPlayer).setDataSource(fileDescriptor);
     }
 
     @Test
     public void play_shouldPrepareMediaPlayer() throws IOException {
-        mediaPlayerManager.play(ANY_FILENAME, mock(ProgressBar.class));
+        mediaPlayerManager.play(ANY_FILE, mock(ProgressBar.class));
 
         verify(mediaPlayer).prepare();
     }
@@ -46,14 +49,14 @@ public class MediaPlayerManagerTest {
     @Test
     public void play_shouldSetProgressBarToDurationOfMediaPlayer() {
         ProgressBar progressBar = mock(ProgressBar.class);
-        mediaPlayerManager.play(ANY_FILENAME, progressBar);
+        mediaPlayerManager.play(ANY_FILE, progressBar);
 
         verify(progressBar).setMax(SOME_DURATION);
     }
 
     @Test
     public void play_shouldStartMediaPlayer() {
-        mediaPlayerManager.play(ANY_FILENAME, mock(ProgressBar.class));
+        mediaPlayerManager.play(ANY_FILE, mock(ProgressBar.class));
 
         verify(mediaPlayer).start();
     }
@@ -93,7 +96,7 @@ public class MediaPlayerManagerTest {
         ProgressBar progressBar = mock(ProgressBar.class);
         when(mediaPlayer.isPlaying()).thenReturn(true);
 
-        mediaPlayerManager.play(ANY_FILENAME, progressBar);
+        mediaPlayerManager.play(ANY_FILE, progressBar);
         mediaPlayerManager.stop();
 
         verify(progressBar).setProgress(0);
@@ -103,8 +106,8 @@ public class MediaPlayerManagerTest {
     public void play_shouldResetProgressBarIfItHasBeenSet() {
         ProgressBar progressBar = mock(ProgressBar.class);
 
-        mediaPlayerManager.play(ANY_FILENAME, progressBar);
-        mediaPlayerManager.play(ANY_FILENAME, mock(ProgressBar.class));
+        mediaPlayerManager.play(ANY_FILE, progressBar);
+        mediaPlayerManager.play(ANY_FILE, mock(ProgressBar.class));
 
         verify(progressBar).setProgress(0);
     }
