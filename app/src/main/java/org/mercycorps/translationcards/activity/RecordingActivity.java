@@ -334,7 +334,7 @@ public class RecordingActivity extends AppCompatActivity {
         recordingStatus = (filename == null) ? RecordingStatus.FRESH : RecordingStatus.RECORDED;
         setContentView(R.layout.recording_audio);
         if (recordingStatus == RecordingStatus.RECORDED) {
-            findViewById(R.id.recording_audio_save).setVisibility(View.VISIBLE);
+            setAudioSaveButtonToVisible();
         }
         recycleBitmap();
         TextView titleView = (TextView) findViewById(R.id.recording_audio_title);
@@ -358,7 +358,7 @@ public class RecordingActivity extends AppCompatActivity {
                     case RECORDING:
                         stopRecording();
                         findViewById(R.id.recording_audio_back).setVisibility(View.VISIBLE);
-                        findViewById(R.id.recording_audio_save).setVisibility(View.VISIBLE);
+                        setAudioSaveButtonToVisible();
                         break;
                 }
             }
@@ -374,7 +374,7 @@ public class RecordingActivity extends AppCompatActivity {
                     case RECORDING:
                         stopRecording();
                         findViewById(R.id.recording_audio_back).setVisibility(View.VISIBLE);
-                        findViewById(R.id.recording_audio_save).setVisibility(View.VISIBLE);
+                        setAudioSaveButtonToVisible();
                         startListening();
                         break;
                     case RECORDED:
@@ -424,6 +424,13 @@ public class RecordingActivity extends AppCompatActivity {
             }
         });
         stepHistory.push(Step.AUDIO);
+    }
+
+    private void setAudioSaveButtonToVisible() {
+        findViewById(R.id.recording_audio_save).setVisibility(View.VISIBLE);
+        TextView audioSaveText = (TextView) findViewById(R.id.recording_audio_save_text);
+        findViewById(R.id.recording_audio_save_image).setBackgroundResource(R.drawable.forward_arrow);
+        audioSaveText.setTextColor(ContextCompat.getColor(RecordingActivity.this, R.color.primaryTextColor));
     }
 
     private void startRecording() {
