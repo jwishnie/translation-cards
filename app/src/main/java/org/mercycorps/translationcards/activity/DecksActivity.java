@@ -56,10 +56,9 @@ public class DecksActivity extends AppCompatActivity {
     }
 
     private void initDecks() {
+        ArrayAdapter<Deck> listAdapter = new DecksAdapter(this, R.layout.deck_item, R.id.deck_name,
+                new ArrayList<Deck>());
         ListView decksListView = (ListView) findViewById(R.id.decks_list);
-        ArrayList<Deck> listItems = new ArrayList<>();
-        ArrayAdapter<Deck> listAdapter = new DecksAdapter(this,
-                R.layout.deck_item, R.id.deck_name, listItems, decksListView);
         decksListView.setAdapter(listAdapter);
 
         for (Deck deck : dbManager.getAllDecks()) {
@@ -83,12 +82,9 @@ public class DecksActivity extends AppCompatActivity {
 
     private class DecksAdapter extends ArrayAdapter<Deck> {
 
-        private ListView decks;
-
         public DecksAdapter(Context context, int resource, int textViewResourceId,
-                            List<Deck> objects, ListView decks) {
+                            List<Deck> objects) {
             super(context, resource, textViewResourceId, objects);
-            this.decks = decks;
         }
 
         @Override
