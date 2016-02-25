@@ -47,6 +47,10 @@ public class Dictionary {
         return label;
     }
 
+    public Translation[] getTranslations() {
+        return translations;
+    }
+
     public int getTranslationCount() {
         return translations.length;
     }
