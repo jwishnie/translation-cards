@@ -80,7 +80,7 @@ public class TranslationsActivity extends RoboActionBarActivity {
     private int currentDictionaryIndex;
     private TextView[] languageTabTextViews;
     private View[] languageTabBorders;
-    private CardListAdapter listAdapter;
+    private TranslationCardListAdapter listAdapter;
     private Deck deck;
     private boolean[] translationCardStates;
     private MediaPlayerManager lastMediaPlayerManager;
@@ -135,9 +135,8 @@ public class TranslationsActivity extends RoboActionBarActivity {
         findViewById(R.id.card_list_header).setOnClickListener(null);
 
         list.addFooterView(layoutInflater.inflate(R.layout.card_list_footer, list, false));
-        listAdapter = new CardListAdapter(
-                this, R.layout.translation_item, R.id.origin_translation_text,
-                new ArrayList<Dictionary.Translation>());
+        listAdapter = new TranslationCardListAdapter(this, R.layout.translation_item,
+                R.id.origin_translation_text, new ArrayList<Dictionary.Translation>(), lastMediaPlayerManager, deck);
         list.setAdapter(listAdapter);
         ImageButton addTranslationButton = (ImageButton) findViewById(R.id.add_button);
         if (deck.isLocked()) {

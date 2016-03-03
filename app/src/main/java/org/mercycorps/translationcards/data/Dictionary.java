@@ -104,6 +104,9 @@ public class Dictionary {
         }
 
         public String getTranslatedText() {
+            if (translatedText == null) {
+                return "";
+            }
             return translatedText;
         }
 
