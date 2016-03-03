@@ -28,9 +28,7 @@ import java.util.List;
 
 public class TranslationCardListAdapter extends ArrayAdapter<Dictionary.Translation> {
 
-    @Inject
-    DbManager dbm;
-
+    private final DbManager dbm;
     private static final int REQUEST_KEY_EDIT_CARD = 2;
     private final MediaPlayerManager mediaPlayerManager;
     private Deck deck;
@@ -40,11 +38,12 @@ public class TranslationCardListAdapter extends ArrayAdapter<Dictionary.Translat
     private int dictionaryIndex;
 
     public TranslationCardListAdapter(Context context, int resource, int textViewResourceId,
-            List<Dictionary.Translation> objects, MediaPlayerManager mediaPlayerManager, Deck deck) {
+                                      List<Dictionary.Translation> objects, MediaPlayerManager mediaPlayerManager, Deck deck, DbManager dbm) {
         super(context, resource, textViewResourceId, objects);
         this.context = context;
         this.mediaPlayerManager = mediaPlayerManager;
         this.deck = deck;
+        this.dbm = dbm;
     }
 
     public void setDictionary(Dictionary[] dictionaryList, int dictionaryIndex) {
@@ -70,23 +69,7 @@ public class TranslationCardListAdapter extends ArrayAdapter<Dictionary.Translat
             convertView.findViewById(R.id.indicator_icon).setBackgroundResource(R.drawable.expand_arrow);
         }
 
-
-
-        View deleteView = convertView.findViewById(R.id.translation_card_delete);
-        deleteView.setOnClickListener(new CardDeleteClickListener(getItem(position).getDbId()));
-
-//        if (deck.isLocked()) {
-//            editView.setVisibility(View.GONE);
-//            deleteView.setVisibility(View.GONE);
-//        } else {
-//            editView.setOnClickListener(new CardEditClickListener(getItem(position)));
-//        }
-//
-
         Dictionary.Translation translation = getItem(position);
-
-        View editView = convertView.findViewById(R.id.translation_card_edit);
-        editView.setOnClickListener(new CardEditClickListener(translation));
 
         ProgressBar progressBar = (ProgressBar) convertView.findViewById(
                 R.id.list_item_progress_bar);
@@ -105,6 +88,17 @@ public class TranslationCardListAdapter extends ArrayAdapter<Dictionary.Translat
                 .setOnClickListener(new CardIndicatorClickListener(convertView, position));
 
         convertView.setOnClickListener(null);
+
+        View editView = convertView.findViewById(R.id.translation_card_edit);
+        View deleteView = convertView.findViewById(R.id.translation_card_delete);
+
+        if (deck.isLocked()) {
+            editView.setVisibility(View.GONE);
+            deleteView.setVisibility(View.GONE);
+        } else {
+            editView.setOnClickListener(new CardEditClickListener(getItem(position)));
+            deleteView.setOnClickListener(new CardDeleteClickListener(getItem(position).getDbId()));
+        }
 
         return convertView;
     }

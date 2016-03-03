@@ -2,6 +2,7 @@ package org.mercycorps.translationcards.activity;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,10 +26,11 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlertDialog;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import roboguice.RoboGuice;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
@@ -49,6 +51,8 @@ public class TranslationCardListAdapterTest {
     private TranslationCardListAdapter translationCardListAdapter;
     private DbManager dbManager;
     private Dictionary.Translation translation;
+    private TranslationsActivity translationsActivity;
+    private Dictionary dictionary;
 
     @Before
     public void setUp() throws Exception {
@@ -59,13 +63,12 @@ public class TranslationCardListAdapterTest {
 
         Intent intent = new Intent();
         intent.putExtra("Deck", mock(Deck.class));
-        TranslationsActivity translationsActivity = Robolectric.buildActivity(TranslationsActivity.class).withIntent(intent).create().get();
-        ArrayList<Dictionary.Translation> translations = new ArrayList<>();
+        translationsActivity = Robolectric.buildActivity(TranslationsActivity.class).withIntent(intent).create().get();
         translationCardListAdapter = new TranslationCardListAdapter(translationsActivity,
                 R.layout.translation_item, R.id.origin_translation_text, new ArrayList<Dictionary.Translation>(),
-                mock(MediaPlayerManager.class), mock(Deck.class));
+                mock(MediaPlayerManager.class), mock(Deck.class), dbManager);
 
-        Dictionary dictionary = mock(Dictionary.class);
+        dictionary = mock(Dictionary.class);
         when(dictionary.getLabel()).thenReturn(DICTIONARY_LABEL);
         when(dictionary.getTranslationCount()).thenReturn(2);
         translationCardListAdapter.setDictionary(new Dictionary[]{dictionary}, 0);
@@ -92,7 +95,7 @@ public class TranslationCardListAdapterTest {
 
         TextView originText = (TextView) listItem.findViewById(R.id.origin_translation_text);
 
-        assertThat(shadowOf(originText).getOnClickListener(), is(CardAudioClickListener.class));
+        assertThat(shadowOf(originText).getOnClickListener(), is(instanceOf(CardAudioClickListener.class)));
     }
 
     @Test
@@ -113,6 +116,7 @@ public class TranslationCardListAdapterTest {
         TextView translatedText = (TextView) listItem.findViewById(R.id.translated_text);
 
         assertThat(translatedText.getText().toString(), is("Add " + DICTIONARY_LABEL + " translation"));
+        assertThat(translatedText.getCurrentTextColor(), is(Color.rgb(134, 134, 134)));
     }
 
     @Test
@@ -122,7 +126,7 @@ public class TranslationCardListAdapterTest {
 
         View translatedTextLayout = listItem.findViewById(R.id.translated_text_layout);
 
-        assertThat(shadowOf(translatedTextLayout).getOnClickListener(), is(CardAudioClickListener.class));
+        assertThat(shadowOf(translatedTextLayout).getOnClickListener(), is(instanceOf(CardAudioClickListener.class)));
     }
 
     @Test
@@ -191,6 +195,38 @@ public class TranslationCardListAdapterTest {
         ShadowAlertDialog.getLatestAlertDialog().getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         verify(dbManager).deleteTranslation(translation.getDbId());
+    }
+
+    @Test
+    public void getView_shouldNotBeAbleToEditWhenDeckIsLocked() {
+        Deck deckMock = mock(Deck.class);
+        TranslationCardListAdapter adapter = new TranslationCardListAdapter(translationsActivity,
+                R.layout.translation_item, R.id.origin_translation_text, asList(translation),
+                mock(MediaPlayerManager.class), deckMock, dbManager);
+        adapter.setDictionary(new Dictionary[]{dictionary}, 0);
+
+        when(deckMock.isLocked()).thenReturn(true);
+
+        View listItem = adapter.getView(0, null, null);
+        View editCardLayout = listItem.findViewById(R.id.translation_card_edit);
+
+        assertThat(editCardLayout.getVisibility(), is(View.GONE));
+    }
+
+    @Test
+    public void getView_shouldNotBeAbleToDeleteWhenDeckIsLocked() {
+        Deck deckMock = mock(Deck.class);
+        TranslationCardListAdapter adapter = new TranslationCardListAdapter(translationsActivity,
+                R.layout.translation_item, R.id.origin_translation_text, asList(translation),
+                mock(MediaPlayerManager.class), deckMock, dbManager);
+        adapter.setDictionary(new Dictionary[]{dictionary}, 0);
+
+        when(deckMock.isLocked()).thenReturn(true);
+
+        View listItem = adapter.getView(0, null, null);
+        View deleteCardLayout = listItem.findViewById(R.id.translation_card_delete);
+
+        assertThat(deleteCardLayout.getVisibility(), is(View.GONE));
     }
 
     private void initializeMockDbManager() {
